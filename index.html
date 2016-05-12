@@ -6,7 +6,7 @@
 
 	<title>Document</title>
 	<!-- CSS Files -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">	
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css">
 	<link rel="stylesheet" href="css/style.css">
 </head>
@@ -18,9 +18,16 @@
 			<h3>Learn about all the turtles below before you decide take the <strong>TURTLE QUIZ</strong></h3>
 		</div>
 
-		<div ng-controller="listController as listCtrl">
+		<div ng-controller="listController as listCtrl" ng-hide="listCtrl.quizMetrics.quizActive">
+		<form class="form-inline well well-sm clearfix">
+			<span class="glyphicon glyphicon-search"></span>
+			<input type="text" placeholder="Search..." class="form-control" ng-model="listCtrl.search">
+			<button class="btn btn-secondary pull-right" ng-click="listCtrl.activateQuiz()">
+				<strong>Start Quiz</strong>
+			</button>
+		</form>
 			<div class="row">
-				<div class="col-sm-6" ng-repeat="turtle in listCtrl.data">
+				<div class="col-sm-6" ng-repeat="turtle in listCtrl.data | filter: listCtrl.search">
 					<div class="well well-sm">
 						<div class="row">
 							<div class="col-md-6">
@@ -32,21 +39,132 @@
 								<p><strong>Size: </strong> {{turtle.size}}</p>
 								<p><strong>Average Lifespan: </strong>{{turtle.lifespan}}</p>
 								<p><strong>Diet: </strong>{{turtle.diet}}</p>
-								<button class="btn btn-primary pull-right">Learn more</button>
+                                <button class="btn btn-primary pull-right"
+                                    data-toggle="modal"
+                                    data-target="#turtle-info"
+                                    ng-click="listCtrl.changeActiveTurtle(turtle)">Learn More</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		<!-- Modal -->
+		<div class="modal" id="turtle-info">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h2>{{listCtrl.activeTurtle.type}}</h2>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-xs-8 col-xs-offset-2">
+								<img ng-src="{{listCtrl.activeTurtle.image_url}}" alt="" class="img-rounded img-responsive">
+							</div>
+						</div>
+							<div class="row">
+								<div class="col-md-6">
+									<p><strong>Location: </strong>{{listCtrl.activeTurtle.location}}</p>
+									<p><strong>Size: </strong>{{listCtrl.activeTurtle.size}}</p>
+									<p><strong>Average lifespan: </strong>{{listCtrl.activeTurtle.lifespan}}</p>
+									<p><strong>Diet: </strong>{{listCtrl.activeTurtle.diet}}</p>
+									
+								</div>
+							</div>
+							<div class="col-xs-12 top-buffer">
+								<p>{{listCtrl.activeTurtle.description}}</p>
+							</div>
+					</div>
+					<div class="modal-footer">
+						<div class="row">
+							<div class="col-xs-12">
+								<button class="btn btn-danger pull-right" data-dismiss="modal" aria-hidden="true">Close</button>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+		<!-- End of modal -->
+
+		</div><!-- List of turtles controller -->
+
+		<div ng-controller="quizController as quizCtrl" ng-show="quizCtrl.quizMetrics.quizActive">
+			<div class="row">
+				<div class="col-xs-8">
+					<h2>Progress: </h2>
+					<div class="btn-toolbar">
+						<button class="btn "ng-repeat="question in quizCtrl.dataService.quizQuestions"
+						ng-class="{'btn-info': question.selected !== null, 'btn-danger': question.selected === null }">
+						<span class="glyphicon" ng-class="{'glyphicon-pencil': question.selected !== null, 'glyphicon-question-sign': question.selected === null}"></span>
+						</button>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="row">
+						<h4>Legend:</h4>
+						<div class="col-sm-4">
+							<button class="btn btn-info">
+								<span class="glyphicon glyphicon-pencil"></span>
+							</button>
+							<p>Answered</p>
+						</div>
+						<div class="col-sm-4">
+							<button class="btn btn-danger">
+								<span class="glyphicon glyphicon-question-sign"></span>
+							</button>
+							<p>Unanswered</p>
+						</div>
+					</div>
+				</div>
+			</div><!-- Progress area -->
+
+			<div class="row">
+				<h3>Question: </h3>
+				<div class="well well-sm">
+					<div class="row">
+						<div class="col-xs-12">
+							<h4>{{quizCtrl.activeQuestion+1 + ". " + quizCtrl.dataService.quizQuestions[quizCtrl.activeQuestion].text}}</h4>
+							
+						</div>
+					</div>
+
+					<div class="row" ng-if="quizCtrl.dataService.quizQuestions[quizCtrl.activeQuestion].type === 'text' ">
+						<div class="col-sm-6" ng-repeat="answer in quizCtrl.dataService.quizQuestions[quizCtrl.activeQuestion].possibilities">
+							<h4 class="answer" ng-class="{'bg-info': $index === quizCtrl.dataService.quizQuestions[quizCtrl.activeQuestion].selected}" ng-click="quizCtrl.selectAnswer($index)">
+								{{answer.answer}}
+							</h4>
+						</div>
+					</div>
+
+					<div class="row" ng-if="quizCtrl.dataService.quizQuestions[quizCtrl.activeQuestion].type === 'image' ">
+						<div class="col-sm-6" ng-repeat="answer in quizCtrl.dataService.quizQuestions[quizCtrl.activeQuestion].possibilities">
+							<div class="image-answer">
+								<img ng-src="{{answer.answer}}" alt="">
+							</div>
+						</div>	
+					</div>
+
+				</div>
+				<button class="btn btn-warning" ng-click="quizCtrl.questionAnswered()">Continue</button>
+			</div>
+		</div>
+	
+
+	
+
 	</div>
 	
 
 	<!-- Scripts files -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	<script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+	<script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
 	<script src="js/app.js"></script>
 	<script src="js/controllers/ListController.js"></script>
+	<script src="js/controllers/QuizController.js"></script>
+	<script src="js/factories/QuizMetrics.js"></script>
+	<script src="js/factories/DataService.js"></script>
 </body>
 </html>
