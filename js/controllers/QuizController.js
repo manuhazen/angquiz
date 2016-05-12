@@ -21,17 +21,24 @@
 			dataService.quizQuestions[vm.activeQuestion].selected = index;
 		}
 
-		function setActiveQuestion(){
-			var breakOut = false;
-			var quizLength = dataService.quizQuestions.length - 1;
+		function setActiveQuestion(index){
+			if(index === undefined){
 
-			while(!breakOut) {
-				vm.activeQuestion = vm.activeQuestion < quizLength?++vm.activeQuestion:0;
-				
-				if(dataService.quizQuestion[vm.activeQuestion].selected == null){
-					breakOut = true;
+				var breakOut = false;
+				var quizLength = dataService.quizQuestions.length - 1;
+
+				while(!breakOut) {
+					vm.activeQuestion = vm.activeQuestion < quizLength?++vm.activeQuestion:0;
+					
+					if(dataService.quizQuestion[vm.activeQuestion].selected == null){
+						breakOut = true;
+					}
 				}
+
+			} else {
+				vm.activeQuestion = index;
 			}
+
 		};
 
 		function questionAnswered(){

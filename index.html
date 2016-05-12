@@ -95,7 +95,7 @@
 					<h2>Progress: </h2>
 					<div class="btn-toolbar">
 						<button class="btn "ng-repeat="question in quizCtrl.dataService.quizQuestions"
-						ng-class="{'btn-info': question.selected !== null, 'btn-danger': question.selected === null }">
+						ng-class="{'btn-info': question.selected !== null, 'btn-danger': question.selected === null }" ng-click="quizCtrl.setActiveQuestion($index)">
 						<span class="glyphicon" ng-class="{'glyphicon-pencil': question.selected !== null, 'glyphicon-question-sign': question.selected === null}"></span>
 						</button>
 					</div>
@@ -139,7 +139,7 @@
 
 					<div class="row" ng-if="quizCtrl.dataService.quizQuestions[quizCtrl.activeQuestion].type === 'image' ">
 						<div class="col-sm-6" ng-repeat="answer in quizCtrl.dataService.quizQuestions[quizCtrl.activeQuestion].possibilities">
-							<div class="image-answer">
+							<div class="image-answer" ng-class="{'image-selected': $index === quizCtrl.dataService.quizQuestions[quizCtrl.activeQuestion].selected}" ng-click="quizCtrl.selectAnswer($index)">
 								<img ng-src="{{answer.answer}}" alt="">
 							</div>
 						</div>	
