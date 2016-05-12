@@ -13,6 +13,8 @@
 		vm.questionAnswered = questionAnswered;
 		vm.selectAnswer = selectAnswer;
 		vm.setActiveQuestion = setActiveQuestion;
+		vm.error = false;
+		vm.finalise = false;
 		vm.activeQuestion =  0;
 	
 		var numQuestionsAnswered = 0;
@@ -30,6 +32,10 @@
 				while(!breakOut) {
 					vm.activeQuestion = vm.activeQuestion < quizLength?++vm.activeQuestion:0;
 					
+					if(vm.activeQuestion === 0){
+						vm.error = true;
+					}
+
 					if(dataService.quizQuestion[vm.activeQuestion].selected == null){
 						breakOut = true;
 					}
@@ -49,6 +55,15 @@
 				numQuestionsAnswered++;
 				if(numQuestionsAnswered >= quizLength){
 					//finalize quiz
+					for (var i = Things.length - 1; i >= 0; i++) {
+						if(dataService.quizQuestions[i].selected === null){
+							setActiveQuestion(i);
+							return;
+						}
+					}
+					vm.error = false;
+					vm.finalise = true;
+					return;
 				}
 			}
 
