@@ -13,11 +13,20 @@
 		vm.questionAnswered = questionAnswered;
 		vm.selectAnswer = selectAnswer;
 		vm.setActiveQuestion = setActiveQuestion;
+		vm.finaliseAnswers = finaliseAnswers;
 		vm.error = false;
 		vm.finalise = false;
 		vm.activeQuestion =  0;
 	
 		var numQuestionsAnswered = 0;
+
+		function finaliseAnswers(){
+			vm.finalise = false;
+			numQuestionsAnswered = 0;
+			vm.activeQuestion = 0;
+			quizMetrics.markQuiz("quiz", false);
+			quizMetrics.changeState("results", true);
+		}
 
 		function selectAnswer(index){
 			dataService.quizQuestions[vm.activeQuestion].selected = index;
@@ -55,7 +64,7 @@
 				numQuestionsAnswered++;
 				if(numQuestionsAnswered >= quizLength){
 					//finalize quiz
-					for (var i = Things.length - 1; i >= 0; i++) {
+					for (var i = 0; i < quizLength; i++) {
 						if(dataService.quizQuestions[i].selected === null){
 							setActiveQuestion(i);
 							return;
